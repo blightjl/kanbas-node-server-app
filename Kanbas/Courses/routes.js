@@ -1,8 +1,17 @@
 import Database from "../Database/index.js";
 
 export default function CourseRoutes(app) {
+  // app.get("/api/courses/Home", (req, res) => {
+  //   const course = [];
+  //   res.send(course);
+  // });
+
     app.get("/api/courses/:id", (req, res) => {
         const { id } = req.params;
+        if (id === "Home") {
+          res.send([]);
+          return;
+        }
         const course = Database.courses
           .find((c) => c._id === id);
         if (!course) {

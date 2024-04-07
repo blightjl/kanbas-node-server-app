@@ -45,6 +45,10 @@ function ModuleRoutes(app) {
 
     app.get("/api/courses/:cid/modules", (req, res) => {
         const { cid } = req.params;
+        if (cid === "Home") {
+            res.send([]);
+            return;
+        }
         const modules = db.modules.filter((m) => m.course === cid);
         res.send(modules);
     });
