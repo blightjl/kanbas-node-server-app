@@ -1,56 +1,41 @@
-import db from "../Database/index.js";
+// import db from "../Database/index.js";
+import * as dao from "./dao.js";
 
 function ModuleRoutes(app) {
-    app.put("/api/modules/:mid", (req, res) => {
+    // update
+    app.put("/api/modules/:mid", async (req, res) => {
         console.log(req.body);
         const { mid } = req.params;
-        const moduleIndex = db.modules.findIndex(
-            (m) => m._id === mid);
-        console.log(req.body)
-        db.modules[moduleIndex] = {
-            ...db.modules[moduleIndex],
-            ...req.body
-        };
-        res.sendStatus(204);
+        const status = await dao.updateUser(mid, req.body);
+        currentModule = await dao.findModuleById(mid);
+        console.log(req.body);
+        res.sendStatus(status);
     });
-
-    app.delete("/api/modules/:mid", (req, res) => {
-        console.log("DELETING MODULE IN MODULES ROUTE");
+    // delete
+    app.delete("/api/modules/:mid", async (req, res) => {
         const { mid } = req.params;
-        console.log(mid);
-        var success = false;
-        db.modules = db.modules.filter((m) => { const foundMID = m._id !== mid; if (!foundMID) { success = true; } return foundMID });
-        if (success) {
-            res.sendStatus(200);
-            console.log("200");
-        }
-         else {
-            // res.sendStatus(444);
-            console.log("404");
-        }
+        const status = await dao.deleteModule(mid);
+        res.json(status);
         console.log(db.modules);
     });
-
-    app.post("/api/courses/:cid/modules", (req, res) => {
-        const { cid } = req.params;
-        const newModule = {
-            ...req.body,
-            course: cid,
-            _id: new Date().getTime().toString(),
-        };
-        console.log(newModule);
-        db.modules.push(newModule);
-        res.send(newModule);
+    // create
+    app.post("/api/courses/:cid/modules", async (req, res) => {
+        const module = await dao.createModule(req.body);
+        res.json(module);
     });
-
-    app.get("/api/courses/:cid/modules", (req, res) => {
+    // read
+    app.get("/api/courses/:cid/modules", async (req, res) => {
         const { cid } = req.params;
         if (cid === "Home") {
             res.send([]);
             return;
         }
-        const modules = db.modules.filter((m) => m.course === cid);
-        res.send(modules);
+        console.log("CID");
+        // console.log(cid);
+        console.log("CID HERE");
+        const modules = await dao.findModuleById(cid);
+        // console.log(modules);
+        res.send([]);
     });
 }
 export default ModuleRoutes;
